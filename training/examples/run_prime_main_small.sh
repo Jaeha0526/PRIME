@@ -7,8 +7,8 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export TOKENIZERS_PARALLELISM=true
 
 PROJECT_NAME='PRIME'
-EXPERIMENT_NAME='online-after-solvable-0.2-0.8-policy-self-ref'
-DATA_PATH=/workspace/data
+EXPERIMENT_NAME='small-dataset-test'
+DATA_PATH=/workspace/data_small
 SFT_MODEL_PATH=/workspace/prime_model/Eurus-2-7B-SFT
 CKPT_PATH=/workspace/prime_model
 
@@ -16,13 +16,13 @@ python3 -m verl.trainer.main_ppo \
     data.train_files=["$DATA_PATH/train.parquet"] \
     data.val_files=["$DATA_PATH/validation.parquet"] \
     data.train_batch_size=64 \
-    data.val_batch_size=256 \
-    data.max_prompt_length=1024 \
-    data.max_response_length=3072 \
+    data.val_batch_size=32 \
+    data.max_prompt_length=512 \
+    data.max_response_length=1024 \
     actor_rollout_ref.model.path=$SFT_MODEL_PATH \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.actor.ppo_mini_batch_size=64 \
-    actor_rollout_ref.actor.ppo_micro_batch_size=4 \
+    actor_rollout_ref.actor.ppo_micro_batch_size=2 \
     actor_rollout_ref.actor.fsdp_config.param_offload=True \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
@@ -58,11 +58,10 @@ python3 -m verl.trainer.main_ppo \
     reward_model.model.input_tokenizer=null \
     reward_model.prime_model.use_remove_padding=True \
     reward_model.prime_granularity=token \
-    reward_model.micro_batch_size=4 \
+    reward_model.micro_batch_size=2 \
     reward_model.prime_model.update=after \
     reward_model.prime_model.beta_train=0.05 \
     reward_model.prime_model.optim.lr=1e-6 \
     reward_model.prime_model.optim.grad_clip=10.0 \
     reward_model.prime_model.input_tokenizer=null \
-    trainer.default_local_dir=$CKPT_PATH/$PROJECT_NAME/$EXPERIMENT_NAME
-
+    trainer.default_local_dir=$CKPT_PATH/$PROJECT_NAME/$EXPERIMENT_NAME 
